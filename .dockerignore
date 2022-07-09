@@ -1,0 +1,21 @@
+./builds
+./**/node_modules
+./**/yarn.lock
+
+# docker
+docker-compose*
+.dockerignore
+
+# git
+.git
+.gitignore
+**/.git
+
+# editor setting
+.vscode
+
+# others
+.DS_Store
+**/.DS_Store
+.env.template
+README.md

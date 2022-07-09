@@ -1,0 +1,75 @@
+version: '3.8'
+
+x-exec-options: &it-common
+  stdin_open: true
+  tty: true
+
+services:
+  frontend:
+    build: 
+      context: ./client
+      dockerfile: ../builds/frontend/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
+    container_name: frontend
+    env_file: ./.env
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    volumes:
+      - ./client:/app/client
+    networks:
+      - frontend
+    depends_on:
+      - backend
+    restart: unless-stopped
+    <<: *it-common
+  
+  backend:
+    build:
+      context: ./server
+      dockerfile: ../builds/backend/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
+    container_name: backend
+    env_file: ./.env
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    volumes:
+      - ./server:/app/server
+    environment: 
+      MYSQL_HOST_IP: mysql
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - mysql
+      - redis
+    restart: unless-stopped
+    <<: *it-common
+
+  mysql:
+    image: mysql
+    container_name: mysql
+    env_file: ./.env
+    ports:
+      - ${MYSQL_PORT}:${MYSQL_PORT}
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    networks:
+      - backend
+    restart: unless-stopped
+    <<: *it-common
+  
+  redis:
+    image: redis:alpine
+    container_name: redis
+    env_file: ./.env
+    ports:
+      - ${REDIS_PORT}:${REDIS_PORT}
+    networks:
+      - backend
+    restart: unless-stopped
+    <<: *it-common
+
+networks:
+  frontend:
+  backend:
