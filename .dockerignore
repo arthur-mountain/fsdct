@@ -1,6 +1,6 @@
 ./builds
-./**/node_modules
-./**/yarn.lock
+**/node_modules
+**/yarn.lock
 
 # docker
 docker-compose*

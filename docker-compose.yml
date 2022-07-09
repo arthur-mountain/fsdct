@@ -1,6 +1,11 @@
 version: '3.8'
 
-x-exec-options: &it-common
+x-database-variables: &database-env
+  MYSQL_DATABASE: ${MYSQL_DATABASE}
+  MYSQL_USER: ${MYSQL_USER}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+x-exec-settings: &exec-settings
   stdin_open: true
   tty: true
 
@@ -20,7 +25,7 @@ services:
     depends_on:
       - backend
     restart: unless-stopped
-    <<: *it-common
+    <<: *exec-settings
   
   backend:
     build:
@@ -33,7 +38,8 @@ services:
     volumes:
       - ./server:/app/server
     environment: 
-      MYSQL_HOST_IP: mysql
+      MYSQL_HOST: ${MYSQL_HOST}
+      <<: *database-env
     networks:
       - frontend
       - backend
@@ -41,7 +47,7 @@ services:
       - mysql
       - redis
     restart: unless-stopped
-    <<: *it-common
+    <<: *exec-settings
 
   mysql:
     image: mysql
@@ -51,13 +57,11 @@ services:
       - ${MYSQL_PORT}:${MYSQL_PORT}
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      <<: *database-env
     networks:
       - backend
     restart: unless-stopped
-    <<: *it-common
+    <<: *exec-settings
   
   redis:
     image: redis:alpine
@@ -68,7 +72,7 @@ services:
     networks:
       - backend
     restart: unless-stopped
-    <<: *it-common
+    <<: *exec-settings
 
 networks:
   frontend:
