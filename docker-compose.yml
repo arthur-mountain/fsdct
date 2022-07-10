@@ -61,6 +61,8 @@ services:
     networks:
       - backend
     restart: unless-stopped
+    # TODO: Should fixed this warning, use authentication_policy instead? 
+    command: --default-authentication-plugin=mysql_native_password
     <<: *exec-settings
   
   redis:
