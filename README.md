@@ -1,4 +1,4 @@
-# Full-stack services(React、Express、Mysql、Redis)
+# Full-Stack Docker-Compose Template(React、Express、Mysql、Redis)
 
 ###### Purpose:
     Focus on practice backend services.
