@@ -1,5 +1,18 @@
+# env
+**/.env
 .env
-./dist
+
+# node_modules
+**/dist
+dist
+
+# node_modules
 **/node_modules
-.DS_Store
+
+# editer setting
+**/.vscode
 .vscode
+
+# others
+**/.DS_Store
+.DS_Store

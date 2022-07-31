@@ -1,6 +1,7 @@
-./builds
+builds
 **/node_modules
 **/yarn.lock
+**/package.json
 
 # docker
 docker-compose*
@@ -10,12 +11,14 @@ docker-compose*
 .git
 .gitignore
 **/.git
+**/.gitignore
 
 # editor setting
+**/.vscode
 .vscode
 
 # others
-.DS_Store
 **/.DS_Store
+.DS_Store
 .env.template
 README.md
