@@ -2,14 +2,13 @@
 // import { useParams } from "react-router-dom";
 // Hooks
 import useStore from '../../hooks/useStore';
-import { actions } from '../../store/reducer/counter';
+import { actions, CounterStateType } from '../../store/reducer/counter';
 
-type CounterProps = { value: number };
 // type Props ={};
 
-const Index = () => {
+const Todo = () => {
   // const { id } = useParams();
-  const { state, dispatch } = useStore<CounterProps>('counter');
+  const { state, dispatch } = useStore<CounterStateType>('counter');
 
   return (
     <div>
@@ -39,4 +38,4 @@ const Index = () => {
   )
 };
 
-export default Index
+export default Todo;
