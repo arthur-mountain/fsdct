@@ -1,0 +1,89 @@
+version: "3.8"
+
+x-database-variables: &database-env
+  MYSQL_DATABASE: ${MYSQL_DATABASE}
+  MYSQL_USER: ${MYSQL_USER}
+  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+x-shared-settings: &shared-settings
+  restart: unless-stopped
+  stdin_open: true
+  tty: true
+
+# - `networks` 在 docker-compose.network 預計要先被啟動，不然會報錯。
+# - `build.dockerfile` 以 context 的值來指定 dockerfile 的相對路徑，
+#   而 dockerfile 內則以 context 為基礎路徑進行配置
+services:
+  backend:
+    <<: *shared-settings
+    build:
+      context: ../..
+      dockerfile: ./docker/Dockerfile
+    container_name: backend
+    env_file: .env
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    volumes:
+      - ../..:/app/server
+    environment:
+      MYSQL_HOST: ${MYSQL_HOST}
+      <<: *database-env
+    networks:
+      - frontend
+      - backend
+    depends_on:
+      - mysql
+      - redis
+
+  mysql:
+    <<: *shared-settings
+    image: mysql
+    container_name: mysql
+    env_file: .env
+    ports:
+      - ${MYSQL_PORT}:${MYSQL_PORT}
+    volumes:
+      - ./mysql/init:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      <<: *database-env
+    networks:
+      - backend
+    # TODO: Should fixed this warning, use authentication_policy instead?
+    # command: --default-authentication-plugin=mysql_native_password
+
+  redis-node1:
+    <<: *shared-settings
+    build:
+      context: ../..
+      dockerfile: ./docker/redis/Dockerfile
+    container_name: redis-node1
+    env_file: .env
+    ports:
+      - ${REDIS_PORT1}:${REDIS_CONTAINER_PORT}
+    networks:
+      - backend
+
+  redis-node2:
+    <<: *shared-settings
+    build:
+      context: ../..
+      dockerfile: ./docker/redis/Dockerfile
+    container_name: redis-node2
+    env_file: .env
+    ports:
+      - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
+    networks:
+      - backend
+
+  redis-node3:
+    <<: *shared-settings
+    build:
+      context: ../..
+      dockerfile: ./docker/redis/Dockerfile
+    container_name: redis-node3
+    env_file: .env
+    ports:
+      - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
+    networks:
+      - backend
