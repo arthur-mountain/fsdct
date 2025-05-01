@@ -1,13 +1,15 @@
 FROM node:lts
 
+RUN corepack enable
+
 WORKDIR /app/server
 
 # P.S. 以 docker-compose 定義的 context 路徑來複製檔案
-COPY ./package.json ./
+COPY ./package.json /app/server
 
-RUN yarn && yarn cache clean --mirror
+RUN pnpm i
 
 # P.S. 以 docker-compose 定義的 context 路徑來複製檔案
-COPY . ./
+COPY . /app/server
 
-CMD ["yarn", "dev"]
+CMD ["pnpm", "dev"]

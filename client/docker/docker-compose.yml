@@ -6,24 +6,24 @@ x-shared-settings: &shared-settings
   tty: true
 
 # - `build.context`
-#   - '..' 代表以 client folder 作為 context
+#   - 相對於執行 docker-compose 指令時的路徑
 # - `build.dockerfile`
-#   - 以 context 的值來指定 dockerfile 的相對路徑，而 dockerfile 內則以 context 為基礎路徑進行配置
+#   - 相對於 context 的路徑值，以此路徑來指定 dockerfile ，而 dockerfile 內則以 context 為基礎路徑進行配置
 # - `networks`
 #   - 在 docker-compose.network 預計要先被啟動，不然會報錯。
 services:
   frontend:
+    <<: *shared-settings
     build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
+      context: client
+      dockerfile: docker/Dockerfile
     container_name: frontend
-    env_file: .env
+    env_file: ./client/.env
     ports:
       - ${FRONTEND_PORT}:${FRONTEND_PORT}
     volumes:
-      - ..:/app/client
+      - ./client:/app/client
     networks:
       - frontend
     depends_on:
       - backend # 在 server folder，預計要先被啟動，不然 frontend 會報錯
-    <<: *shared-settings

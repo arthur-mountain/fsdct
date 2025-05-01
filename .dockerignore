@@ -1,7 +1,10 @@
 builds
 **/node_modules
+**/pnpm.lock
+**/npm.lock
 **/yarn.lock
 **/package.json
+**/docker
 
 # docker
 docker-compose*

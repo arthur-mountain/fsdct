@@ -1,92 +1,93 @@
 version: "3.8"
 
-x-database-variables: &database-env
-  MYSQL_DATABASE: ${MYSQL_DATABASE}
-  MYSQL_USER: ${MYSQL_USER}
-  MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+# x-database-variables: &database-env
+#   MYSQL_DATABASE: ${MYSQL_DATABASE}
+#   MYSQL_USER: ${MYSQL_USER}
+#   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
 
 x-shared-settings: &shared-settings
+  env_file: ./server/.env
   restart: unless-stopped
   stdin_open: true
   tty: true
 
 # - `build.context`
-#   - '..' 代表以 server folder 作為 context
+#   - 相對於執行 docker-compose 指令時的路徑
 # - `build.dockerfile`
-#   - 以 context 的值來指定 dockerfile 的相對路徑，而 dockerfile 內則以 context 為基礎路徑進行配置
+#   - 相對於 context 的路徑值，以此路徑來指定 dockerfile ，而 dockerfile 內則以 context 為基礎路徑進行配置
 # - `networks`
 #   - 在 docker-compose.network 預計要先被啟動，不然會報錯。
 services:
   backend:
     <<: *shared-settings
     build:
-      context: ..
-      dockerfile: ./docker/Dockerfile
+      context: server
+      dockerfile: docker/Dockerfile
     container_name: backend
-    env_file: .env
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
-      - ..:/app/server
-    environment:
-      MYSQL_HOST: ${MYSQL_HOST}
-      <<: *database-env
+      - ./server/src:/app/server/src
     networks:
       - frontend
       - backend
     depends_on:
-      - mysql
-      - redis
+      # - mysql
+      - redis-node1
+      #- redis-node2
+      #- redis-node3
 
-  mysql:
-    <<: *shared-settings
-    image: mysql
-    container_name: mysql
-    env_file: .env
-    ports:
-      - ${MYSQL_PORT}:${MYSQL_PORT}
-    volumes:
-      - ./mysql/init:/docker-entrypoint-initdb.d
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      <<: *database-env
-    networks:
-      - backend
-    # TODO: Should fixed this warning, use authentication_policy instead?
-    # command: --default-authentication-plugin=mysql_native_password
+  # mysql:
+  #   <<: *shared-settings
+  #   image: mysql
+  #   container_name: mysql
+  #   ports:
+  #     - ${MYSQL_PORT}:${MYSQL_PORT}
+  #   volumes:
+  #     - ./server/mysql/init:/docker-entrypoint-initdb.d
+  #   # environment:
+  #   #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+  #   #   <<: *database-env
+  #   networks:
+  #     - backend
+  #   # TODO: Should fixed this warning, use authentication_policy instead?
+  #   # command: --default-authentication-plugin=mysql_native_password
 
   redis-node1:
     <<: *shared-settings
     build:
-      context: ..
-      dockerfile: ./docker/redis/Dockerfile
-    container_name: redis-node1
-    env_file: .env
+      context: server
+      dockerfile: docker/redis/Dockerfile
+    container_name: $REDIS_HOST1
+    volumes:
+      - ./server/docker/redis/data/node1:/data
     ports:
       - ${REDIS_PORT1}:${REDIS_CONTAINER_PORT}
     networks:
       - backend
 
-  redis-node2:
-    <<: *shared-settings
-    build:
-      context: ..
-      dockerfile: ./docker/redis/Dockerfile
-    container_name: redis-node2
-    env_file: .env
-    ports:
-      - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
-    networks:
-      - backend
-
-  redis-node3:
-    <<: *shared-settings
-    build:
-      context: ..
-      dockerfile: ./docker/redis/Dockerfile
-    container_name: redis-node3
-    env_file: .env
-    ports:
-      - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
-    networks:
-      - backend
+  # redis-node2:
+  #   <<: *shared-settings
+  #   build:
+  #     context: server
+  #     dockerfile: docker/redis/Dockerfile
+  #   container_name: $REDIS_HOST2
+  #   volumes:
+  #     - ./server/docker/redis/data/node2:/data
+  #   ports:
+  #     - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
+  #   networks:
+  #     - backend
+  #
+  # redis-node3:
+  #   <<: *shared-settings
+  #   build:
+  #     context: server
+  #     dockerfile: docker/redis/Dockerfile
+  #   container_name: $REDIS_HOST3
+  #   volumes:
+  #     - ./server/docker/redis/data/node3:/data
+  #   ports:
+  #     - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
+  #   networks:
+  #     - backend
