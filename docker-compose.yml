@@ -68,78 +68,39 @@ services:
     <<: *exec-settings
 
   redis-node1:
-    image: redis:alpine
+    build:
+      context: server
+      dockerfile: ./dockers/redis/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: redis-node1
     env_file: .env
     ports:
       - ${REDIS_PORT1}:${REDIS_CONTAINER_PORT}
-    volumes:
-      - ./server/dockers/redis/confs/node1.conf:/usr/local/etc/redis/redis.conf
-    command:
-      [
-        "redis-server",
-        "/usr/local/etc/redis/redis.conf",
-        "--cluster-enabled",
-        "yes",
-        "--cluster-config-file",
-        "nodes.conf",
-        "--cluster-node-timeout",
-        "5000",
-        "--appendonly",
-        "yes",
-      ]
     networks:
       - backend
     restart: unless-stopped
     <<: *exec-settings
 
   redis-node2:
-    image: redis:alpine
+    build:
+      context: server
+      dockerfile: ./dockers/redis/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: redis-node2
     env_file: .env
     ports:
       - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
-    volumes:
-      - ./server/dockers/redis/confs/node2.conf:/usr/local/etc/redis/redis.conf
-    command:
-      [
-        "redis-server",
-        "/usr/local/etc/redis/redis.conf",
-        "--cluster-enabled",
-        "yes",
-        "--cluster-config-file",
-        "nodes.conf",
-        "--cluster-node-timeout",
-        "5000",
-        "--appendonly",
-        "yes",
-      ]
     networks:
       - backend
     restart: unless-stopped
     <<: *exec-settings
 
   redis-node3:
-    image: redis:alpine
+    build:
+      context: server
+      dockerfile: ./dockers/redis/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: redis-node3
     env_file: .env
     ports:
       - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
-    volumes:
-      - ./server/dockers/redis/confs/node3.conf:/usr/local/etc/redis/redis.conf
-    command:
-      [
-        "redis-server",
-        "/usr/local/etc/redis/redis.conf",
-        "--cluster-enabled",
-        "yes",
-        "--cluster-config-file",
-        "nodes.conf",
-        "--cluster-node-timeout",
-        "5000",
-        "--appendonly",
-        "yes",
-      ]
     networks:
       - backend
     restart: unless-stopped
