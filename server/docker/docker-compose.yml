@@ -10,21 +10,24 @@ x-shared-settings: &shared-settings
   stdin_open: true
   tty: true
 
-# - `networks` 在 docker-compose.network 預計要先被啟動，不然會報錯。
-# - `build.dockerfile` 以 context 的值來指定 dockerfile 的相對路徑，
-#   而 dockerfile 內則以 context 為基礎路徑進行配置
+# - `build.context`
+#   - '..' 代表以 server folder 作為 context
+# - `build.dockerfile`
+#   - 以 context 的值來指定 dockerfile 的相對路徑，而 dockerfile 內則以 context 為基礎路徑進行配置
+# - `networks`
+#   - 在 docker-compose.network 預計要先被啟動，不然會報錯。
 services:
   backend:
     <<: *shared-settings
     build:
-      context: ../..
+      context: ..
       dockerfile: ./docker/Dockerfile
     container_name: backend
     env_file: .env
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
-      - ../..:/app/server
+      - ..:/app/server
     environment:
       MYSQL_HOST: ${MYSQL_HOST}
       <<: *database-env
@@ -55,7 +58,7 @@ services:
   redis-node1:
     <<: *shared-settings
     build:
-      context: ../..
+      context: ..
       dockerfile: ./docker/redis/Dockerfile
     container_name: redis-node1
     env_file: .env
@@ -67,7 +70,7 @@ services:
   redis-node2:
     <<: *shared-settings
     build:
-      context: ../..
+      context: ..
       dockerfile: ./docker/redis/Dockerfile
     container_name: redis-node2
     env_file: .env
@@ -79,7 +82,7 @@ services:
   redis-node3:
     <<: *shared-settings
     build:
-      context: ../..
+      context: ..
       dockerfile: ./docker/redis/Dockerfile
     container_name: redis-node3
     env_file: .env
