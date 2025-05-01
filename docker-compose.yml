@@ -13,7 +13,7 @@ services:
   frontend:
     build:
       context: client
-      dockerfile: ../builds/frontend/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
+      dockerfile: ./dockers/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: frontend
     env_file: .env
     ports:
