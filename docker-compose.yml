@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 x-database-variables: &database-env
   MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -11,7 +11,7 @@ x-exec-settings: &exec-settings
 
 services:
   frontend:
-    build: 
+    build:
       context: client
       dockerfile: ../builds/frontend/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: frontend
@@ -26,18 +26,18 @@ services:
       - backend
     restart: unless-stopped
     <<: *exec-settings
-  
+
   backend:
     build:
       context: server
-      dockerfile: ../builds/backend/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
+      dockerfile: ./dockers/Dockerfile # 以 context 的值來指定 dockerfile 的相對路徑. 而 dockerfile 內則以 context 為基礎路徑進行配置
     container_name: backend
     env_file: .env
     ports:
       - ${BACKEND_PORT}:${BACKEND_PORT}
     volumes:
       - ./server:/app/server
-    environment: 
+    environment:
       MYSQL_HOST: ${MYSQL_HOST}
       <<: *database-env
     networks:
@@ -56,17 +56,17 @@ services:
     ports:
       - ${MYSQL_PORT}:${MYSQL_PORT}
     volumes:
-      - ./builds/backend/mysql.cnf:/docker-entrypoint-initdb.d
+      - ./server/dockers/mysql/confs:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       <<: *database-env
     networks:
       - backend
     restart: unless-stopped
-    # TODO: Should fixed this warning, use authentication_policy instead? 
+    # TODO: Should fixed this warning, use authentication_policy instead?
     # command: --default-authentication-plugin=mysql_native_password
     <<: *exec-settings
-  
+
   redis:
     image: redis:alpine
     container_name: redis
