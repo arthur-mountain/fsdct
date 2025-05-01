@@ -1,5 +1,5 @@
-import express from 'express';
-import cors from 'cors';
+import express from "express";
+import cors from "cors";
 // import mysql from './model/mysql/index.js';
 
 const app = express();
@@ -9,8 +9,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req, res) => {
-  res.json({ message: process.env.MYSQL_HOST || "Can' read docker env variable" })
-})
+app.get("/", (req, res) => {
+  res.json({
+    message: process.env.MYSQL_HOST || "Can' read docker env variable",
+  });
+});
 
-app.listen(port, () => console.log(`🚀 ~ start listening to ${port}`))
+app.listen(port, () => console.log(`🚀 ~ start listening to ${port}`));
