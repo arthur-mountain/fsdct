@@ -67,12 +67,79 @@ services:
     # command: --default-authentication-plugin=mysql_native_password
     <<: *exec-settings
 
-  redis:
+  redis-node1:
     image: redis:alpine
-    container_name: redis
+    container_name: redis-node1
     env_file: .env
     ports:
-      - ${REDIS_PORT}:${REDIS_PORT}
+      - ${REDIS_PORT1}:${REDIS_CONTAINER_PORT}
+    volumes:
+      - ./server/dockers/redis/confs/node1.conf:/usr/local/etc/redis/redis.conf
+    command:
+      [
+        "redis-server",
+        "/usr/local/etc/redis/redis.conf",
+        "--cluster-enabled",
+        "yes",
+        "--cluster-config-file",
+        "nodes.conf",
+        "--cluster-node-timeout",
+        "5000",
+        "--appendonly",
+        "yes",
+      ]
+    networks:
+      - backend
+    restart: unless-stopped
+    <<: *exec-settings
+
+  redis-node2:
+    image: redis:alpine
+    container_name: redis-node2
+    env_file: .env
+    ports:
+      - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
+    volumes:
+      - ./server/dockers/redis/confs/node2.conf:/usr/local/etc/redis/redis.conf
+    command:
+      [
+        "redis-server",
+        "/usr/local/etc/redis/redis.conf",
+        "--cluster-enabled",
+        "yes",
+        "--cluster-config-file",
+        "nodes.conf",
+        "--cluster-node-timeout",
+        "5000",
+        "--appendonly",
+        "yes",
+      ]
+    networks:
+      - backend
+    restart: unless-stopped
+    <<: *exec-settings
+
+  redis-node3:
+    image: redis:alpine
+    container_name: redis-node3
+    env_file: .env
+    ports:
+      - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
+    volumes:
+      - ./server/dockers/redis/confs/node3.conf:/usr/local/etc/redis/redis.conf
+    command:
+      [
+        "redis-server",
+        "/usr/local/etc/redis/redis.conf",
+        "--cluster-enabled",
+        "yes",
+        "--cluster-config-file",
+        "nodes.conf",
+        "--cluster-node-timeout",
+        "5000",
+        "--appendonly",
+        "yes",
+      ]
     networks:
       - backend
     restart: unless-stopped
