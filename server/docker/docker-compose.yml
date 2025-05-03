@@ -28,7 +28,7 @@ services:
       - backend
     depends_on:
       # - postgres
-      - redis-node1
+      - redis-cluster
 
   # postgres:
   #   <<: *shared-settings
@@ -45,6 +45,23 @@ services:
   #   networks:
   #     - backend
 
+  redis-cluster:
+    <<: *shared-settings
+    restart: on-failure:5
+    image: $REDIS_IMAGE
+    networks:
+      - backend
+    depends_on:
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
+    volumes:
+      - ./server/docker/redis/create-cluster.sh:/redis-cluster-setup.sh
+    command: sh /redis-cluster-setup.sh;
+
   redis-node1:
     <<: *shared-settings
     container_name: $REDIS_HOST1
@@ -55,39 +72,14 @@ services:
       - $REDIS_PORT1:$REDIS_PORT1
     networks:
       - backend
-    depends_on:
-      - redis-node2
-      - redis-node3
-      - redis-node4
-      - redis-node5
-      - redis-node6
-    command: >
+    command: |
       sh -c 'redis-server \
         --requirepass $REDIS_PASSWORD \
         --masterauth $REDIS_PASSWORD \
         --port $REDIS_PORT1 \
         --cluster-enabled yes \
         --cluster-node-timeout 5000 \
-        --appendonly yes &
-
-        until redis-cli -h $REDIS_HOST1 -p $REDIS_PORT1 -a $REDIS_PASSWORD ping | grep PONG > /dev/null; do
-          echo "[fsdct]: Waiting for $REDIS_HOST1 to be ready..."
-          sleep 1
-        done
-
-        echo "[fsdct]: Creating cluster..."
-        echo "yes" | redis-cli \
-          -a $REDIS_PASSWORD \
-          --cluster-replicas 1 \
-          --cluster create \
-          $REDIS_HOST1:$REDIS_PORT1 \
-          $REDIS_HOST2:$REDIS_PORT2 \
-          $REDIS_HOST3:$REDIS_PORT3 \
-          $REDIS_HOST4:$REDIS_PORT4 \
-          $REDIS_HOST5:$REDIS_PORT5 \
-          $REDIS_HOST6:$REDIS_PORT6
-        wait
-      '
+        --appendonly yes'
 
   redis-node2:
     <<: *shared-settings
