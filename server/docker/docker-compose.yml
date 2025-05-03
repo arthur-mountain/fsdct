@@ -29,8 +29,6 @@ services:
     depends_on:
       # - postgres
       - redis-node1
-      #- redis-node2
-      #- redis-node3
 
   # postgres:
   #   <<: *shared-settings
@@ -49,39 +47,64 @@ services:
 
   redis-node1:
     <<: *shared-settings
-    build:
-      context: server
-      dockerfile: docker/redis/Dockerfile
     container_name: $REDIS_HOST1
+    image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node1:/data
     ports:
-      - ${REDIS_PORT1}:${REDIS_CONTAINER_PORT}
+      - $REDIS_PORT1:$REDIS_PORT1
     networks:
       - backend
+    depends_on:
+      - redis-node2
+      - redis-node3
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --port $REDIS_PORT1 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes && \
+        echo "yes" | redis-cli \
+          -a $REDIS_PASSWORD \
+          --cluster-replicas 0 \
+          --cluster create \
+          $REDIS_HOST1:$REDIS_PORT1 \
+          $REDIS_HOST2:$REDIS_PORT2 \
+          $REDIS_HOST3:$REDIS_PORT3'
 
-  # redis-node2:
-  #   <<: *shared-settings
-  #   build:
-  #     context: server
-  #     dockerfile: docker/redis/Dockerfile
-  #   container_name: $REDIS_HOST2
-  #   volumes:
-  #     - ./server/docker/redis/data/node2:/data
-  #   ports:
-  #     - ${REDIS_PORT2}:${REDIS_CONTAINER_PORT}
-  #   networks:
-  #     - backend
-  #
-  # redis-node3:
-  #   <<: *shared-settings
-  #   build:
-  #     context: server
-  #     dockerfile: docker/redis/Dockerfile
-  #   container_name: $REDIS_HOST3
-  #   volumes:
-  #     - ./server/docker/redis/data/node3:/data
-  #   ports:
-  #     - ${REDIS_PORT3}:${REDIS_CONTAINER_PORT}
-  #   networks:
-  #     - backend
+  redis-node2:
+    <<: *shared-settings
+    container_name: $REDIS_HOST2
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node2:/data
+    ports:
+      - $REDIS_PORT2:$REDIS_PORT2
+    networks:
+      - backend
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --port $REDIS_PORT2 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes'
+
+  redis-node3:
+    <<: *shared-settings
+    container_name: $REDIS_HOST3
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node3:/data
+    ports:
+      - $REDIS_PORT3:$REDIS_PORT3
+    networks:
+      - backend
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --port $REDIS_PORT3 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes'

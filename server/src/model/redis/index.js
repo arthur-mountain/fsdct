@@ -9,10 +9,18 @@ const getInstance = async (type) => {
       const cluster = createCluster({
         rootNodes: [
           {
-            url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_CONTAINER_PORT}`,
+            url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_PORT1}`,
           },
-          // 若有其他節點可以一併加入
+          {
+            url: `redis://${process.env.REDIS_HOST2}:${process.env.REDIS_PORT2}`,
+          },
+          {
+            url: `redis://${process.env.REDIS_HOST3}:${process.env.REDIS_PORT3}`,
+          },
         ],
+        defaults: {
+          password: process.env.REDIS_PASSWORD,
+        },
       });
 
       cluster.on("error", (err) => {
@@ -26,7 +34,8 @@ const getInstance = async (type) => {
     case "node":
     default: {
       const client = createClient({
-        url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_CONTAINER_PORT}`,
+        url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_PORT1}`,
+        password: process.env.REDIS_PASSWORD,
       });
 
       client.on("error", (err) => {
@@ -43,7 +52,8 @@ const getInstance = async (type) => {
 const getRedis = async () => {
   if (redis) return redis;
 
-  const instance = await getInstance();
+  // const instance = await getInstance();
+  const instance = await getInstance("cluster");
 
   return (redis = {
     /**

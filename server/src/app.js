@@ -29,4 +29,10 @@ app.get("/test", async (req, res) => {
   return res.json({ message: "get value from query", data });
 });
 
+app.get("/test/clean", async (_, res) => {
+  const key = "cache:query";
+  await (await getRedis()).del(key);
+  return res.json({ message: "remove cached query from redis" });
+});
+
 app.listen(port, () => console.log(`🚀 ~ start listening to ${port}`));
