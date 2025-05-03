@@ -1,10 +1,5 @@
 version: "3.8"
 
-# x-database-variables: &database-env
-#   MYSQL_DATABASE: ${MYSQL_DATABASE}
-#   MYSQL_USER: ${MYSQL_USER}
-#   MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-
 x-shared-settings: &shared-settings
   env_file: ./server/.env
   restart: unless-stopped
@@ -32,26 +27,25 @@ services:
       - frontend
       - backend
     depends_on:
-      # - mysql
+      # - postgres
       - redis-node1
       #- redis-node2
       #- redis-node3
 
-  # mysql:
+  # postgres:
   #   <<: *shared-settings
-  #   image: mysql
-  #   container_name: mysql
-  #   ports:
-  #     - ${MYSQL_PORT}:${MYSQL_PORT}
+  #   build:
+  #     context: server
+  #     dockerfile: docker/postgresql/Dockerfile
+  #     args:
+  #       POSTGRES_IMAGE: $POSTGRES_IMAGE
+  #   container_name: $POSTGRES_HOST
   #   volumes:
-  #     - ./server/mysql/init:/docker-entrypoint-initdb.d
-  #   # environment:
-  #   #   MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-  #   #   <<: *database-env
+  #     - ./server/docker/postgresql/data:/data
+  #   ports:
+  #     - $POSTGRES_PORT:$POSTGRES_CONTAINER_PORT
   #   networks:
   #     - backend
-  #   # TODO: Should fixed this warning, use authentication_policy instead?
-  #   # command: --default-authentication-plugin=mysql_native_password
 
   redis-node1:
     <<: *shared-settings

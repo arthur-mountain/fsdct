@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-// import mysql from './model/mysql/index.js';
+// import {db} from './model/postgresql/index.js';
 import { getRedis } from "./model/redis/index.js";
 
 const app = express();
