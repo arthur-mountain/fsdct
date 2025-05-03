@@ -31,4 +31,4 @@ const clusterConfig = {
   },
 };
 
-export { clusterConfig };
+export { clientConfig, clusterConfig };

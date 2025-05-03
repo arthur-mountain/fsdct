@@ -2,7 +2,7 @@ version: "3.8"
 
 x-shared-settings: &shared-settings
   env_file: ./server/.env
-  restart: unless-stopped
+  restart: on-failure:10
   stdin_open: true
   tty: true
   networks:
