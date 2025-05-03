@@ -1,36 +1,12 @@
-// libs/redis.js
 import { createClient, createCluster } from "redis";
+import { clientConfig, clusterConfig } from "./config.js";
 
 let redis = null;
 
 const getInstance = async (type) => {
   switch (type) {
     case "cluster": {
-      const cluster = createCluster({
-        rootNodes: [
-          {
-            url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_PORT1}`,
-          },
-          {
-            url: `redis://${process.env.REDIS_HOST2}:${process.env.REDIS_PORT2}`,
-          },
-          {
-            url: `redis://${process.env.REDIS_HOST3}:${process.env.REDIS_PORT3}`,
-          },
-          {
-            url: `redis://${process.env.REDIS_HOST4}:${process.env.REDIS_PORT4}`,
-          },
-          {
-            url: `redis://${process.env.REDIS_HOST5}:${process.env.REDIS_PORT5}`,
-          },
-          {
-            url: `redis://${process.env.REDIS_HOST6}:${process.env.REDIS_PORT6}`,
-          },
-        ],
-        defaults: {
-          password: process.env.REDIS_PASSWORD,
-        },
-      });
+      const cluster = createCluster(clusterConfig);
 
       cluster.on("error", (err) => {
         console.error("❌ Redis Cluster error:", err);
@@ -42,10 +18,7 @@ const getInstance = async (type) => {
     }
     case "node":
     default: {
-      const client = createClient({
-        url: `redis://${process.env.REDIS_HOST1}:${process.env.REDIS_PORT1}`,
-        password: process.env.REDIS_PASSWORD,
-      });
+      const client = createClient(clientConfig);
 
       client.on("error", (err) => {
         console.error("❌ Redis error:", err);
@@ -61,7 +34,6 @@ const getInstance = async (type) => {
 const getRedis = async () => {
   if (redis) return redis;
 
-  // const instance = await getInstance();
   const instance = await getInstance("cluster");
 
   return (redis = {
