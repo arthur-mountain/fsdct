@@ -59,8 +59,8 @@ services:
       - redis-node5
       - redis-node6
     volumes:
-      - ./server/docker/redis/create-cluster.sh:/redis-cluster-setup.sh
-    command: sh /redis-cluster-setup.sh;
+      - ./server/docker/redis/create-cluster.sh:/cluster-setup.sh
+    command: sh /cluster-setup.sh;
 
   redis-node1:
     <<: *shared-settings
@@ -68,16 +68,12 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node1:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT1:$REDIS_PORT1
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT1 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT1
+    command: sh /create-node.sh;
 
   redis-node2:
     <<: *shared-settings
@@ -85,16 +81,12 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node2:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT2:$REDIS_PORT2
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT2 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT2
+    command: sh /create-node.sh;
 
   redis-node3:
     <<: *shared-settings
@@ -102,16 +94,12 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node3:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT3:$REDIS_PORT3
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT3 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT3
+    command: sh /create-node.sh;
 
   redis-node4:
     <<: *shared-settings
@@ -119,16 +107,12 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node4:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT4:$REDIS_PORT4
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT4 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT4
+    command: sh /create-node.sh;
 
   redis-node5:
     <<: *shared-settings
@@ -136,16 +120,12 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node5:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT5:$REDIS_PORT5
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT5 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT5
+    command: sh /create-node.sh;
 
   redis-node6:
     <<: *shared-settings
@@ -153,13 +133,9 @@ services:
     image: $REDIS_IMAGE
     volumes:
       - ./server/docker/redis/data/node6:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
     ports:
       - $REDIS_PORT6:$REDIS_PORT6
-    command: |
-      sh -c 'redis-server \
-        --requirepass $REDIS_PASSWORD \
-        --masterauth $REDIS_PASSWORD \
-        --port $REDIS_PORT6 \
-        --cluster-enabled yes \
-        --cluster-node-timeout 5000 \
-        --appendonly yes'
+    environment:
+      REDIS_PORT: $REDIS_PORT6
+    command: sh /create-node.sh;
