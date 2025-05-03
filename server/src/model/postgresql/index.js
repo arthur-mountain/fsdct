@@ -1,4 +1,6 @@
-import pgp from "pg-promise";
+import pgPromise, { QueryFile } from "pg-promise";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const db = (() => {
   const initOpts = {
@@ -12,7 +14,8 @@ const db = (() => {
       console.error("PG ERROR:", err.message || err);
     },
   };
-  const client = pgp(initOpts)(
+  const pgp = pgPromise(initOpts);
+  const client = pgp(
     "postgres://" +
       process.env.POSTGRES_TEST_USERNAME1 +
       ":" +
@@ -26,6 +29,15 @@ const db = (() => {
   );
 
   return {
+    // --- SQL File loader (從 ./sqls/xxx) ---
+    sqlLoader: (filepath) => {
+      const filename = fileURLToPath(import.meta.url);
+      const dirname = path.dirname(filename);
+      return new QueryFile(path.join(dirname, "sqls", filepath), {
+        minify: true,
+      });
+    },
+
     query: (sql, params = []) => {
       if (!sql) {
         console.error("Please pass the SQL statement");
@@ -41,8 +53,7 @@ const db = (() => {
           return await client.any(sql, params);
         } catch (err) {
           console.warn(
-            `Query failed (attempt ${attempt}/${retries}):`,
-            err.message,
+            `Query failed (attempt ${attempt}/${retries}): SQL: ${sql}, Error: ${err.message}`,
           );
           if (attempt === retries) throw err;
           await new Promise((res) => setTimeout(res, delay));
@@ -50,11 +61,38 @@ const db = (() => {
       }
     },
 
+    // --- ORM ---
+    insert: (table, data) => {
+      const query = pgp.helpers.insert(data, Object.keys(data), table);
+      return client.none(query); // No retry needed here
+    },
+
+    update: (table, data, condition) => {
+      const cs = new pgp.helpers.ColumnSet(Object.keys(data), { table });
+      const query =
+        pgp.helpers.update(data, cs) +
+        pgp.as.format(
+          " WHERE " +
+            Object.keys(condition)
+              .map((key, i) => `${key} = $${i + 1}`)
+              .join(" AND "),
+          Object.values(condition),
+        );
+      return client.none(query); // No retry needed here
+    },
+
+    delete: (table, condition) => {
+      const where = Object.keys(condition)
+        .map((key, i) => `${key} = $${i + 1}`)
+        .join(" AND ");
+      const query = `DELETE FROM ${table} WHERE ${where}`;
+      return client.none(query, Object.values(condition)); // No retry needed here
+    },
+
+    // --- transaction ---
     transaction: async (callback) => {
       try {
-        return await client.tx(async (t) => {
-          return await callback(t); // t 提供給 callback 使用 query
-        });
+        return await client.tx(callback);
       } catch (err) {
         console.error("TRANSACTION ERROR:", err);
         throw err;
