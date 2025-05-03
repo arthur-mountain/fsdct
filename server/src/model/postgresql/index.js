@@ -68,25 +68,29 @@ const db = (() => {
     },
 
     update: (table, data, condition) => {
+      if (!condition || !condition.sql || !Array.isArray(condition.values)) {
+        throw new Error("Invalid condition format: use { sql, values }");
+      }
+
       const cs = new pgp.helpers.ColumnSet(Object.keys(data), { table });
       const query =
         pgp.helpers.update(data, cs) +
-        pgp.as.format(
-          " WHERE " +
-            Object.keys(condition)
-              .map((key, i) => `${key} = $${i + 1}`)
-              .join(" AND "),
-          Object.values(condition),
-        );
-      return client.none(query); // No retry needed here
+        pgp.as.format(` WHERE ${condition.sql}`, condition.values);
+
+      return client.none(query);
     },
 
     delete: (table, condition) => {
-      const where = Object.keys(condition)
-        .map((key, i) => `${key} = $${i + 1}`)
-        .join(" AND ");
-      const query = `DELETE FROM ${table} WHERE ${where}`;
-      return client.none(query, Object.values(condition)); // No retry needed here
+      if (!condition || !condition.sql || !Array.isArray(condition.values)) {
+        throw new Error("Invalid condition format: use { sql, values }");
+      }
+
+      const query = pgp.as.format(
+        `DELETE FROM ${table} WHERE ${condition.sql}`,
+        condition.values,
+      );
+
+      return client.none(query);
     },
 
     // --- transaction ---
