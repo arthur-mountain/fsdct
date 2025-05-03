@@ -20,7 +20,7 @@ services:
       dockerfile: docker/Dockerfile
     container_name: backend
     ports:
-      - ${BACKEND_PORT}:${BACKEND_PORT}
+      - $BACKEND_PORT:$BACKEND_PORT
     volumes:
       - ./server/src:/app/server/src
     networks:
@@ -58,20 +58,36 @@ services:
     depends_on:
       - redis-node2
       - redis-node3
-    command: |
+      - redis-node4
+      - redis-node5
+      - redis-node6
+    command: >
       sh -c 'redis-server \
         --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
         --port $REDIS_PORT1 \
         --cluster-enabled yes \
         --cluster-node-timeout 5000 \
-        --appendonly yes && \
+        --appendonly yes &
+
+        until redis-cli -h $REDIS_HOST1 -p $REDIS_PORT1 -a $REDIS_PASSWORD ping | grep PONG > /dev/null; do
+          echo "[fsdct]: Waiting for $REDIS_HOST1 to be ready..."
+          sleep 1
+        done
+
+        echo "[fsdct]: Creating cluster..."
         echo "yes" | redis-cli \
           -a $REDIS_PASSWORD \
-          --cluster-replicas 0 \
+          --cluster-replicas 1 \
           --cluster create \
           $REDIS_HOST1:$REDIS_PORT1 \
           $REDIS_HOST2:$REDIS_PORT2 \
-          $REDIS_HOST3:$REDIS_PORT3'
+          $REDIS_HOST3:$REDIS_PORT3 \
+          $REDIS_HOST4:$REDIS_PORT4 \
+          $REDIS_HOST5:$REDIS_PORT5 \
+          $REDIS_HOST6:$REDIS_PORT6
+        wait
+      '
 
   redis-node2:
     <<: *shared-settings
@@ -86,6 +102,7 @@ services:
     command: |
       sh -c 'redis-server \
         --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
         --port $REDIS_PORT2 \
         --cluster-enabled yes \
         --cluster-node-timeout 5000 \
@@ -104,7 +121,65 @@ services:
     command: |
       sh -c 'redis-server \
         --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
         --port $REDIS_PORT3 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes'
+
+  redis-node4:
+    <<: *shared-settings
+    container_name: $REDIS_HOST4
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node4:/data
+    ports:
+      - $REDIS_PORT4:$REDIS_PORT4
+    networks:
+      - backend
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
+        --port $REDIS_PORT4 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes'
+
+  redis-node5:
+    <<: *shared-settings
+    container_name: $REDIS_HOST5
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node5:/data
+    ports:
+      - $REDIS_PORT5:$REDIS_PORT5
+    networks:
+      - backend
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
+        --port $REDIS_PORT5 \
+        --cluster-enabled yes \
+        --cluster-node-timeout 5000 \
+        --appendonly yes'
+
+  redis-node6:
+    <<: *shared-settings
+    container_name: $REDIS_HOST6
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node6:/data
+    ports:
+      - $REDIS_PORT6:$REDIS_PORT6
+    networks:
+      - backend
+    command: |
+      sh -c 'redis-server \
+        --requirepass $REDIS_PASSWORD \
+        --masterauth $REDIS_PASSWORD \
+        --port $REDIS_PORT6 \
         --cluster-enabled yes \
         --cluster-node-timeout 5000 \
         --appendonly yes'
