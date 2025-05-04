@@ -5,5 +5,6 @@ redis-server \
   --masterauth "$REDIS_PASSWORD" \
   --port "$REDIS_PORT" \
   --cluster-enabled yes \
+  --cluster-announce-ip "$REDIS_HOST" \
   --cluster-node-timeout 5000 \
   --appendonly yes
