@@ -30,7 +30,6 @@ services:
       - backend
     depends_on:
       # - postgres
-      - redis-cluster
 
   # postgres:
   #   <<: *shared-settings
@@ -46,21 +45,6 @@ services:
   #     - $POSTGRES_PORT:$POSTGRES_CONTAINER_PORT
   #   networks:
   #     - backend
-
-  redis-cluster:
-    <<: *shared-settings
-    restart: on-failure:5
-    image: $REDIS_IMAGE
-    depends_on:
-      - redis-node1
-      - redis-node2
-      - redis-node3
-      - redis-node4
-      - redis-node5
-      - redis-node6
-    volumes:
-      - ./server/docker/redis/create-cluster.sh:/cluster-setup.sh
-    command: sh /cluster-setup.sh;
 
   redis-node1:
     <<: *shared-settings
