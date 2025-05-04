@@ -1,8 +1,12 @@
-import pgPromise, { QueryFile } from "pg-promise";
+import pgPromise from "pg-promise";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-const db = (() => {
+let db;
+
+const getDB = () => {
+  if (db) return db;
+
   const initOpts = {
     query(e) {
       console.log("SQL:", e.query);
@@ -23,28 +27,28 @@ const db = (() => {
       "@" +
       process.env.POSTGRES_HOST +
       ":" +
-      process.env.POSTGRES_CONTAINER_PORT +
+      process.env.PGPORT +
       "/" +
       process.env.POSTGRES_DB,
   );
 
-  return {
+  return (db = {
     // --- SQL File loader (從 ./sqls/xxx) ---
     sqlLoader: (filepath) => {
       const filename = fileURLToPath(import.meta.url);
       const dirname = path.dirname(filename);
-      return new QueryFile(path.join(dirname, "sqls", filepath), {
+      return new pgPromise.QueryFile(path.join(dirname, "sqls", filepath), {
         minify: true,
       });
     },
 
-    query: (sql, params = []) => {
+    query: (sql, values = []) => {
       if (!sql) {
         console.error("Please pass the SQL statement");
         return;
       }
 
-      return client.any(sql, params);
+      return client.any(sql, values);
     },
 
     queryWithRetry: async (sql, params = [], retries = 3, delay = 500) => {
@@ -102,7 +106,7 @@ const db = (() => {
         throw err;
       }
     },
-  };
-})();
+  });
+};
 
-export { db };
+export { getDB };

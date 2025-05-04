@@ -17,10 +17,10 @@ x-shared-settings: &shared-settings
 services:
   backend:
     <<: *shared-settings
+    container_name: backend
     build:
       context: server
       dockerfile: docker/Dockerfile
-    container_name: backend
     ports:
       - $BACKEND_PORT:$BACKEND_PORT
     volumes:
@@ -28,23 +28,24 @@ services:
     networks:
       - frontend
       - backend
-    # depends_on:
-    # - postgres
+    depends_on:
+      - postgres
+      - redis-node1
+      - redis-node2
+      - redis-node3
+      - redis-node4
+      - redis-node5
+      - redis-node6
 
-  # postgres:
-  #   <<: *shared-settings
-  #   build:
-  #     context: server
-  #     dockerfile: docker/postgresql/Dockerfile
-  #     args:
-  #       POSTGRES_IMAGE: $POSTGRES_IMAGE
-  #   container_name: $POSTGRES_HOST
-  #   volumes:
-  #     - ./server/docker/postgresql/data:/data
-  #   ports:
-  #     - $POSTGRES_PORT:$POSTGRES_CONTAINER_PORT
-  #   networks:
-  #     - backend
+  postgres:
+    <<: *shared-settings
+    container_name: $POSTGRES_HOST
+    image: $POSTGRES_IMAGE
+    volumes:
+      - ./server/docker/postgresql/data:/var/lib/postgresql/data
+      - ./server/migrations/postgresql:/docker-entrypoint-initdb.d
+    ports:
+      - $PGPORT:$PGPORT
 
   redis-node1:
     <<: *shared-settings
