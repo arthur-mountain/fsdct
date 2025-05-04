@@ -1,6 +1,8 @@
 # env
 **/.env
 .env
+!**/.env.template
+!.env.template
 
 # node_modules
 **/dist
@@ -17,6 +19,9 @@ dist
 **/.DS_Store
 .DS_Store
 
+# SQLs but not includes users and permissions sql setup
 !*.sql
+users-and-permissions.sql
 
+# Docker Volumes
 **/docker/**/data
