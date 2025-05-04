@@ -28,8 +28,8 @@ services:
     networks:
       - frontend
       - backend
-    depends_on:
-      # - postgres
+    # depends_on:
+    # - postgres
 
   # postgres:
   #   <<: *shared-settings
@@ -56,6 +56,7 @@ services:
     ports:
       - $REDIS_PORT1:$REDIS_PORT1
     environment:
+      REDIS_HOST: $REDIS_HOST1
       REDIS_PORT: $REDIS_PORT1
     command: sh /create-node.sh;
 
@@ -69,6 +70,7 @@ services:
     ports:
       - $REDIS_PORT2:$REDIS_PORT2
     environment:
+      REDIS_HOST: $REDIS_HOST2
       REDIS_PORT: $REDIS_PORT2
     command: sh /create-node.sh;
 
@@ -82,6 +84,7 @@ services:
     ports:
       - $REDIS_PORT3:$REDIS_PORT3
     environment:
+      REDIS_HOST: $REDIS_HOST3
       REDIS_PORT: $REDIS_PORT3
     command: sh /create-node.sh;
 
@@ -95,6 +98,7 @@ services:
     ports:
       - $REDIS_PORT4:$REDIS_PORT4
     environment:
+      REDIS_HOST: $REDIS_HOST4
       REDIS_PORT: $REDIS_PORT4
     command: sh /create-node.sh;
 
@@ -108,6 +112,7 @@ services:
     ports:
       - $REDIS_PORT5:$REDIS_PORT5
     environment:
+      REDIS_HOST: $REDIS_HOST5
       REDIS_PORT: $REDIS_PORT5
     command: sh /create-node.sh;
 
@@ -121,5 +126,6 @@ services:
     ports:
       - $REDIS_PORT6:$REDIS_PORT6
     environment:
+      REDIS_HOST: $REDIS_HOST6
       REDIS_PORT: $REDIS_PORT6
     command: sh /create-node.sh;
