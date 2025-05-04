@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 set -a
-source ./server/.env
+source "$(dirname "$0")/../.env"
 set +a
 
 # 定義 Redis container 名稱（或 hostname:port，如果 container 名就是 host）
