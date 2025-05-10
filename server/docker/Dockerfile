@@ -1,15 +1,13 @@
 FROM node:lts
 
-RUN corepack enable
-
-WORKDIR /app/server
+WORKDIR /app
 
 # P.S. 以 docker-compose 定義的 context 路徑來複製檔案
-COPY ./package.json /app/server
+COPY ./package.json ./
 
-RUN pnpm i
+RUN corepack enable pnpm && pnpm i --frozen-lockfile
 
 # P.S. 以 docker-compose 定義的 context 路徑來複製檔案
-COPY . /app/server
+COPY . .
 
 CMD ["pnpm", "dev"]
