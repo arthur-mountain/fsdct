@@ -1,10 +1,5 @@
 version: "3.8"
 
-x-shared-settings: &shared-settings
-  restart: unless-stopped
-  stdin_open: true
-  tty: true
-
 # - `build.context`
 #   - 相對於執行 docker-compose 指令時的路徑
 # - `build.dockerfile`
@@ -13,14 +8,16 @@ x-shared-settings: &shared-settings
 #   - 在 docker-compose.network 預計要先被啟動，不然會報錯。
 services:
   frontend:
-    <<: *shared-settings
+    container_name: frontend
     build:
       context: client
       dockerfile: docker/Dockerfile
-    container_name: frontend
+    restart: on-failure:10
+    stdin_open: true
+    tty: true
     env_file: ./client/.env
     ports:
-      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+      - $FRONTEND_PORT:$FRONTEND_PORT
     volumes:
       - ./client:/app/client
     networks:
