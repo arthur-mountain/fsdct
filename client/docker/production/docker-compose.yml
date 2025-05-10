@@ -1,0 +1,24 @@
+version: "3.8"
+
+# - `build.context`
+#   - 相對於執行 docker-compose 指令時的路徑
+# - `build.dockerfile`
+#   - 相對於 context 的路徑值，以此路徑來指定 dockerfile ，而 dockerfile 內則以 context 為基礎路徑進行配置
+# - `networks`
+#   - 在 docker-compose.network 預計要先被啟動，不然會報錯。
+services:
+  frontend:
+    container_name: frontend
+    build:
+      context: client
+      dockerfile: docker/production/Dockerfile
+    restart: on-failure:10
+    stdin_open: true
+    tty: true
+    env_file: ./client/.env
+    ports:
+      - $PORT:$PORT
+    networks:
+      - frontend
+    depends_on:
+      - backend # 在 server folder，預計要先被啟動，不然 frontend 會報錯

@@ -11,15 +11,15 @@ services:
     container_name: frontend
     build:
       context: client
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/development/Dockerfile
     restart: on-failure:10
     stdin_open: true
     tty: true
     env_file: ./client/.env
     ports:
-      - $FRONTEND_PORT:$FRONTEND_PORT
+      - $PORT:$PORT
     volumes:
-      - ./client:/app/client
+      - ./client/src:/app/src
     networks:
       - frontend
     depends_on:
