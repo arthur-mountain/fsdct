@@ -1,4 +1,4 @@
-version: "3.8"
+version: "3.9"
 
 # - `build.context`
 #   - 相對於執行 docker-compose 指令時的路徑
