@@ -10,5 +10,5 @@ docker-compose \
   -f ./server/docker/docker-compose.yml \
   -f ./server/docker/postgresql/docker-compose.yml \
   -f ./server/docker/redis/docker-compose.yml \
+  -f ./client/docker/development/docker-compose.yml \
   "$@"
-# -f ./client/docker/docker-compose.yml \
