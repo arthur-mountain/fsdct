@@ -5,8 +5,7 @@ x-shared-settings: &shared-settings
   restart: on-failure:10
   stdin_open: true
   tty: true
-  networks:
-    - backend
+  networks: [redis]
 
 services:
   redis-node1:

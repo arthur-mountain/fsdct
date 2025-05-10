@@ -19,6 +19,8 @@ services:
     networks:
       - frontend
       - backend
+      - db
+      - redis
     ports:
       - $BACKEND_PORT:$BACKEND_PORT
     volumes:
