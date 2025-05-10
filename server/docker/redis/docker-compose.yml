@@ -1,0 +1,94 @@
+version: "3.8"
+
+x-shared-settings: &shared-settings
+  env_file: ./server/.env
+  restart: on-failure:10
+  stdin_open: true
+  tty: true
+  networks:
+    - backend
+
+services:
+  redis-node1:
+    <<: *shared-settings
+    container_name: $REDIS_HOST1
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node1:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT1:$REDIS_PORT1
+    environment:
+      REDIS_HOST: $REDIS_HOST1
+      REDIS_PORT: $REDIS_PORT1
+    command: sh /create-node.sh;
+
+  redis-node2:
+    <<: *shared-settings
+    container_name: $REDIS_HOST2
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node2:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT2:$REDIS_PORT2
+    environment:
+      REDIS_HOST: $REDIS_HOST2
+      REDIS_PORT: $REDIS_PORT2
+    command: sh /create-node.sh;
+
+  redis-node3:
+    <<: *shared-settings
+    container_name: $REDIS_HOST3
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node3:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT3:$REDIS_PORT3
+    environment:
+      REDIS_HOST: $REDIS_HOST3
+      REDIS_PORT: $REDIS_PORT3
+    command: sh /create-node.sh;
+
+  redis-node4:
+    <<: *shared-settings
+    container_name: $REDIS_HOST4
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node4:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT4:$REDIS_PORT4
+    environment:
+      REDIS_HOST: $REDIS_HOST4
+      REDIS_PORT: $REDIS_PORT4
+    command: sh /create-node.sh;
+
+  redis-node5:
+    <<: *shared-settings
+    container_name: $REDIS_HOST5
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node5:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT5:$REDIS_PORT5
+    environment:
+      REDIS_HOST: $REDIS_HOST5
+      REDIS_PORT: $REDIS_PORT5
+    command: sh /create-node.sh;
+
+  redis-node6:
+    <<: *shared-settings
+    container_name: $REDIS_HOST6
+    image: $REDIS_IMAGE
+    volumes:
+      - ./server/docker/redis/data/node6:/data
+      - ./server/docker/redis/create-node.sh:/create-node.sh
+    ports:
+      - $REDIS_PORT6:$REDIS_PORT6
+    environment:
+      REDIS_HOST: $REDIS_HOST6
+      REDIS_PORT: $REDIS_PORT6
+    command: sh /create-node.sh;

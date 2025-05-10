@@ -6,7 +6,9 @@ source ./server/.env
 set +a
 
 docker-compose \
-  -f docker-componse.network.yml \
+  -f docker-compose.network.yml \
   -f ./server/docker/docker-compose.yml \
+  -f ./server/docker/postgresql/docker-compose.yml \
+  -f ./server/docker/redis/docker-compose.yml \
   "$@"
 # -f ./client/docker/docker-compose.yml \

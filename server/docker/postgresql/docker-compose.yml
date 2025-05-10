@@ -1,0 +1,17 @@
+version: "3.8"
+
+services:
+  postgres:
+    container_name: $POSTGRES_HOST
+    image: $POSTGRES_IMAGE
+    env_file: ./server/.env
+    restart: on-failure:10
+    stdin_open: true
+    tty: true
+    networks:
+      - backend
+    volumes:
+      - ./server/docker/postgresql/data:/var/lib/postgresql/data
+      - ./server/migrations/postgresql:/docker-entrypoint-initdb.d
+    ports:
+      - $PGPORT:$PGPORT
