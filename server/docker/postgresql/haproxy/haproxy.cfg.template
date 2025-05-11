@@ -1,0 +1,27 @@
+defaults
+  mode tcp
+  timeout connect 10s
+  timeout client 1m
+  timeout server 1m
+
+frontend write
+  bind *:${HA_PROXY_WRITE_PORT}
+  default_backend leader
+
+frontend read
+  bind *:${HA_PROXY_READ_PORT}
+  default_backend followers
+
+backend leader
+  option httpchk
+  http-check expect status 200
+  server ${PGHOST1} ${PGHOST1}:${PGPORT} check port ${PATRONI_PORT} inter 30s fall 3 rise 2
+  server ${PGHOST2} ${PGHOST2}:${PGPORT} check port ${PATRONI_PORT} inter 30s fall 3 rise 2
+  server ${PGHOST3} ${PGHOST3}:${PGPORT} check port ${PATRONI_PORT} inter 30s fall 3 rise 2
+
+backend followers
+  option httpchk
+  http-check expect status 200
+  server ${PGHOST1} ${PGHOST1}:${PGPORT} check port ${PATRONI_PORT} backup inter 30s fall 3 rise 2
+  server ${PGHOST2} ${PGHOST2}:${PGPORT} check port ${PATRONI_PORT} backup inter 30s fall 3 rise 2
+  server ${PGHOST3} ${PGHOST3}:${PGPORT} check port ${PATRONI_PORT} backup inter 30s fall 3 rise 2

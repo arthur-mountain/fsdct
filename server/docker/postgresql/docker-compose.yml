@@ -30,6 +30,24 @@ services:
   #   container_name: etcd3
   #   env_file: ./server/docker/postgresql/etcd/.etcd3.env
 
+  # === HAProxy ===
+  # haproxy:
+  #   <<: *shared-settings
+  #   container_name: haproxy
+  #   image: haproxy:3.1
+  #   ports:
+  #     - $HA_PROXY_WRITE_PORT:$HA_PROXY_WRITE_PORT # write (leader)
+  #     - $HA_PROXY_READ_PORT:$HA_PROXY_READ_PORT # read (any replica)
+  #   volumes:
+  #     - ./server/docker/postgresql/haproxy:/usr/local/etc/haproxy
+  #   depends_on:
+  #     patroni1:
+  #       condition: service_healthy
+  #     patroni2:
+  #       condition: service_healthy
+  #     patroni3:
+  #       condition: service_healthy
+
   postgres:
     <<: *shared-settings
     container_name: $POSTGRES_HOST

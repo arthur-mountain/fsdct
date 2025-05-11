@@ -27,3 +27,7 @@ users-and-permissions.sql
 
 # Docker Volumes
 **/docker/**/data
+
+# HA Proxy
+haproxy.cfg
+
