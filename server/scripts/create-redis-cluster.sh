@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# 當 redis 都跑起來後，選擇某一台已經 ready 的 redis
+# 透過 redis-cli 建立 cluster
+
 set -a
 source "$(dirname "$0")/../.env"
 set +a
